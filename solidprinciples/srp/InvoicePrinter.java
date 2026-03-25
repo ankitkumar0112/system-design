@@ -13,8 +13,7 @@ public class InvoicePrinter {
         List<Product> products = shoppingCart.products;
         System.out.println("Invoice");
         for (Product p : products) {
-            System.out.println("Product name : " + p.getProductName());
-            System.out.println("Price : " + p.getPrice());
+            System.out.println("Product name : " + p.getProductName() + ", Price : " + p.getPrice());
         }
     }
 }
