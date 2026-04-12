@@ -1,4 +1,4 @@
-package solidprinciples.lsp;
+package lsp;
 
 public class CurrentAccount implements WithdrawableAccount {
 

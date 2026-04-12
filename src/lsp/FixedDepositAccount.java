@@ -1,7 +1,11 @@
-package solidprinciples.lsp;
+package lsp;
 
 public class FixedDepositAccount implements NonWithdrawableAccount {
-    private float balance = 0;
+    private float balance;
+
+    public FixedDepositAccount() {
+        balance = 0;
+    }
 
     @Override
     public void deposit(float amount) {

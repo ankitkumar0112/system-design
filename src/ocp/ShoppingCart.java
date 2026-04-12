@@ -1,4 +1,4 @@
-package solidprinciples.srp;
+package ocp;
 
 import java.util.ArrayList;
 import java.util.List;

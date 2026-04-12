@@ -1,4 +1,4 @@
-package solidprinciples.lsp;
+package lsp;
 
 public interface WithdrawableAccount extends NonWithdrawableAccount {
     void withdraw(float amount);

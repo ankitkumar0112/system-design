@@ -1,7 +1,11 @@
-package solidprinciples.lsp;
+package lsp;
 
 public class SavingsAccount implements WithdrawableAccount {
-    private float balance = 0;
+    private float balance;
+
+    public SavingsAccount() {
+        balance = 0;
+    }
 
     @Override
     public void deposit(float amount) {

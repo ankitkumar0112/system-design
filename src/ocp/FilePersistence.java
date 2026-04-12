@@ -1,4 +1,4 @@
-package solidprinciples.ocp;
+package ocp;
 
 public class FilePersistence implements Persistence {
     @Override

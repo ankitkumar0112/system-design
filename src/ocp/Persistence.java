@@ -1,4 +1,4 @@
-package solidprinciples.ocp;
+package ocp;
 
 public interface Persistence {
     void save();

@@ -1,4 +1,4 @@
-package solidprinciples.srp;
+package srp;
 
 public class DbStorage {
     ShoppingCart shoppingCart;

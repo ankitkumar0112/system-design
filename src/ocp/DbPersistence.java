@@ -1,4 +1,4 @@
-package solidprinciples.ocp;
+package ocp;
 
 public class DbPersistence implements Persistence {
 

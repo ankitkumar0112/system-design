@@ -1,4 +1,4 @@
-package solidprinciples.srp;
+package srp;
 
 import java.util.List;
 
