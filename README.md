@@ -94,8 +94,8 @@ diagrams, and key takeaways.
 
 | Topic                           | Status         |
 |---------------------------------|----------------|
-| SOLID Principles                | 🔄 In Progress |
-| Creational Design Patterns      | ⬜              |
+| SOLID Principles                | ✅ Done         |
+| Creational Design Patterns      | 🔃 In Progress |
 | Structural Design Patterns      | ⬜              |
 | Behavioral Design Patterns      | ⬜              |
 | UML & Class Diagrams            | ⬜              |
