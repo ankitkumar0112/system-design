@@ -204,7 +204,7 @@ G --> A
 
 1. User searches nearby restaurants.
 2. RestaurantManager returns restaurants.
-3. User views menu.
+3. User views menuItem.
 4. Items are added into Cart.
 5. User chooses Delivery or Takeaway.
 6. Appropriate PaymentService processes payment.

@@ -1,27 +1,31 @@
 package food_delivery_app.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Cart {
-    public Cart() {
-    }
+    private final List<MenuItem> items = new ArrayList<>();
 
-    private final List<Menu> items = new ArrayList<>();
-
-    public void addItem(Menu item) {
+    public void addItem(MenuItem item) {
         items.add(item);
     }
 
-    public void removeItem(Menu item) {
+    public void removeItem(MenuItem item) {
         items.remove(item);
+    }
+
+    public List<MenuItem> getItems() {
+        return Collections.unmodifiableList(items);
+    }
+
+    public double calculateTotal() {
+        return items.stream()
+                .mapToDouble(MenuItem::getPrice)
+                .sum();
     }
 
     public void clear() {
         items.clear();
-    }
-
-    public double getTotal(int id) {
-        return items.stream().mapToDouble(Menu::getPrice).sum();
     }
 }

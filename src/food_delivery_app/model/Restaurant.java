@@ -6,18 +6,24 @@ import java.util.List;
 public class Restaurant {
     private int id;
     private String name;
-    private List<Menu> items = new ArrayList<>();
+    private List<MenuItem> items = new ArrayList<>();
     private String address;
 
-    public Restaurant(int id, String name, List<Menu> items, String address) {
-        this.id = id;
-        this.name = name;
-        this.items = items;
-        this.address = address;
+    public Restaurant() {
     }
 
-    public Restaurant() {
+    public Restaurant(int id, String name, String address) {
+        this.id = id;
+        this.name = name;
+        this.address = address;
+        this.items = new ArrayList<>();
+    }
 
+    public Restaurant(int id, String name, List<MenuItem> items, String address) {
+        this.id = id;
+        this.name = name;
+        this.items = (items != null) ? new ArrayList<>(items) : new ArrayList<>();
+        this.address = address;
     }
 
     public int getId() {
@@ -36,11 +42,11 @@ public class Restaurant {
         this.name = name;
     }
 
-    public List<Menu> getItems() {
+    public List<MenuItem> getItems() {
         return items;
     }
 
-    public void setItems(List<Menu> items) {
+    public void setItems(List<MenuItem> items) {
         this.items = items;
     }
 
@@ -52,7 +58,10 @@ public class Restaurant {
         this.address = address;
     }
 
-    public void addItems(Menu menu) {
-        items.add(menu);
+    public void addItem(MenuItem menuItem) {
+        if (this.items == null) {
+            this.items = new ArrayList<>();
+        }
+        this.items.add(menuItem);
     }
 }

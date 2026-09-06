@@ -13,7 +13,7 @@ and strategy patterns.
 ## Features
 
 - Search restaurants
-- View restaurant menu
+- View restaurant menuItem
 - Add / Remove items from cart
 - Delivery & Takeaway orders
 - Multiple payment methods
@@ -121,7 +121,7 @@ Business logic classes.
 1. User searches restaurants.
 2. RestaurantManager returns matching restaurants.
 3. User selects restaurant.
-4. User adds menu items to cart.
+4. User adds menuItem items to cart.
 5. User places Delivery or Takeaway order.
 6. Selected PaymentService processes payment.
 7. NotificationService sends confirmation.
