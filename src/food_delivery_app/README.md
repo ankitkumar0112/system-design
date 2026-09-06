@@ -1,138 +1,61 @@
-# 🍔 Food Delivery App - Low Level Design (Java)
+# Food Delivery System - Low Level Design (LLD)
 
-A Java implementation of the **Low Level Design (LLD)** for a Food Delivery application using Object-Oriented Design
-principles and common design patterns.
-
-## Objective
-
-This project demonstrates how a food delivery system can be designed using clean architecture, interfaces, composition,
-and strategy patterns.
+A modular, extensible Low-Level Design implementation of a Food Delivery System built in Java, adhering to SOLID
+principles and standard Gang of Four (GoF) design patterns.
 
 ---
 
-## Features
+## 1. System Requirements
 
-- Search restaurants
-- View restaurant menuItem
-- Add / Remove items from cart
-- Delivery & Takeaway orders
-- Multiple payment methods
-- Email / Mobile notifications
-- Singleton restaurant manager
-
----
-
-## Design Patterns Used
-
-| Pattern      | Implementation        |
-|--------------|-----------------------|
-| Singleton    | `RestaurantManager`   |
-| Strategy     | `PaymentService`      |
-| Strategy     | `NotificationService` |
-| Polymorphism | `Order` interface     |
-| Composition  | User → Cart           |
-| Composition  | Restaurant → Menu     |
+* **User Management:** Maintain user profile information.
+* **Restaurant & Menu Management:** Restaurants maintain menus containing items with defined prices.
+* **Cart Management:** Encapsulated cart lifecycle managed via `CartService` (adding/removing items, calculating
+  subtotals, and clearing).
+* **Order Processing:** Support extensible order types (`DeliveryOrder`, `TakeawayOrder`) with customized bill
+  calculations.
+* **Payment Subsystem:** Extensible strategy-based payment execution (Credit Card, Debit Card, UPI).
+* **Notification Subsystem:** Decoupled observer-based event dispatch for real-time order tracking (Email, Mobile Push).
 
 ---
 
-## Project Structure
+## 2. Design Patterns Implemented
+
+* **Strategy Pattern (`food_delivery_app.payment`):** `PaymentStrategy` interface allows runtime swapping of payment
+  algorithms (`CreditCard`, `DebitCard`) without modifying `PaymentService` (Open/Closed Principle).
+* **Observer Pattern (`food_delivery_app.notification`):** `NotificationObserver` allows event-driven broadcasts to
+  registered delivery channels (`EmailNotification`, `MobileNotification`).
+* **Service Layer Pattern (`food_delivery_app.service`):** `CartService` orchestrates business domain logic separately
+  from data model entities.
+* **Polymorphism & Liskov Substitution Principle (`food_delivery_app.order`):** `Order` interface contracts order
+  operations uniformly across `DeliveryOrder` (with fee routing) and `TakeawayOrder`.
+
+---
+
+## 3. Package Structure
 
 ```text
-food_delivery_app/
-│
+src/food_delivery_app/
+├── FoodDeliveryApp.java              # Main driver/orchestrator
 ├── model/
-│   ├── User.java
-│   ├── Restaurant.java
-│   ├── Menu.java
-│   └── Cart.java
-│
+│   ├── Cart.java                     # Cart entity holding selected items
+│   ├── MenuItem.java                 # Individual dish item
+│   ├── OrderStatus.java              # Lifecycle status enum
+│   ├── Restaurant.java               # Restaurant entity and menu registry
+│   └── User.java                     # Customer profile entity
 ├── notification/
-│   ├── NotificationService.java
-│   ├── EmailNotification.java
-│   └── MobileNotification.java
-│
+│   ├── EmailNotification.java        # Email observer implementation
+│   ├── MobileNotification.java       # Mobile push observer implementation
+│   ├── NotificationObserver.java     # Observer interface
+│   └── NotificationService.java      # Subject / broadcaster
 ├── order/
-│   ├── Order.java
-│   ├── DeliveryOrder.java
-│   └── TakeawayOrder.java
-│
+│   ├── DeliveryOrder.java            # Home delivery calculation with fees
+│   ├── Order.java                    # Base Order interface
+│   └── TakeawayOrder.java            # Self-pickup order calculation
 ├── payment/
-│   ├── PaymentService.java
-│   ├── CreditCard.java
-│   └── DebitCard.java
-│
-├── service/
-│   ├── RestaurantManager.java
-│   └── CartService.java
-│
-├── FoodDeliveryApp.java
-│── README.md
-└── LLD_Flow.md
-```
-
----
-
-## Package Responsibilities
-
-### model
-
-Contains all business entities.
-
-- User
-- Restaurant
-- Menu
-- Cart
-
-### order
-
-Responsible for order creation.
-
-- Order (Interface)
-- DeliveryOrder
-- TakeawayOrder
-
-### payment
-
-Payment strategy implementations.
-
-- PaymentService
-- CreditCard
-- DebitCard
-
-### notification
-
-Notification strategy implementations.
-
-- NotificationService
-- EmailNotification
-- MobileNotification
-
-### service
-
-Business logic classes.
-
-- RestaurantManager (Singleton)
-- CartService
-
----
-
-## Execution Flow
-
-1. User searches restaurants.
-2. RestaurantManager returns matching restaurants.
-3. User selects restaurant.
-4. User adds menuItem items to cart.
-5. User places Delivery or Takeaway order.
-6. Selected PaymentService processes payment.
-7. NotificationService sends confirmation.
-
----
-
-## Future Improvements
-
-- UPI Payment
-- Wallet Payment
-- Coupon Engine
-- Delivery Partner Assignment
-- Order Tracking
-- Rating & Reviews
+│   ├── CreditCard.java               # Credit card payment strategy
+│   ├── DebitCard.java                # Debit card payment strategy
+│   ├── PaymentService.java           # Payment orchestration service
+│   └── PaymentStrategy.java          # Strategy interface
+└── service/
+    ├── CartService.java              # Cart operations orchestrator
+    └── RestaurantManager.java        # Restaurant lookup and discovery

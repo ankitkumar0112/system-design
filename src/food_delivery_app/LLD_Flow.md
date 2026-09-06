@@ -1,212 +1,206 @@
-# Food Delivery App - Low Level Design
-
-This document contains the UML diagrams and overall flow of the Food Delivery application.
+# Food Delivery System - LLD Flow & Architecture
 
 ---
 
-# 1. Class Diagram
+## 1. High-Level Architecture Flow
+
+```mermaid
+graph TD
+    A[User & Restaurant Setup] --> B[CartService Orchestrator]
+    B -->|addItem / removeItem| C[Cart Entity]
+    B -->|getItems snapshot| D[Order Factory / Creation]
+    D -->|DeliveryOrder| E[Delivery Order: Items + Fee]
+    D -->|TakeawayOrder| F[Takeaway Order: Items Only]
+    E & F --> G[PaymentService]
+    G -->|PaymentStrategy| H[CreditCard / DebitCard]
+    H -->|Payment Success| I[Order Placed & Cleared]
+    I --> J[NotificationService]
+    J -->|Broadcast| K[EmailNotification]
+    J -->|Broadcast| L[MobileNotification]
+```
+
+---
+
+## 2. Class Diagram
 
 ```mermaid
 classDiagram
-direction LR
+    direction TB
 
-class User{
-    +int id
-    +String name
-    +long phone
-}
+    class User {
+        -int id
+        -String name
+        -String contact
+        +getId() int
+        +getName() String
+        +getContact() String
+    }
 
-class Cart{
-    +List~Menu~ items
-    +addItem()
-    +removeItem()
-    +clear()
-    +getTotal()
-}
+    class MenuItem {
+        -int id
+        -String name
+        -double price
+        +getId() int
+        +getName() String
+        +getPrice() double
+    }
 
-class Restaurant{
-    +int id
-    +String name
-    +String address
-}
+    class Restaurant {
+        -int id
+        -String name
+        -String address
+        -List~MenuItem~ items
+        +addItem(MenuItem menuItem) void
+        +getItems() List~MenuItem~
+        +getName() String
+    }
 
-class Menu{
-    +int id
-    +String name
-    +double price
-}
+    class Cart {
+        -List~MenuItem~ items
+        +addItem(MenuItem item) void
+        +removeItem(MenuItem item) void
+        +calculateTotal() double
+        +getItems() List~MenuItem~
+        +clear() void
+    }
 
-class CartService{
-    +addItem()
-    +removeItem()
-    +calculateTotal()
-}
+    class CartService {
+        -Cart cart
+        +addItem(MenuItem item) void
+        +removeItem(MenuItem item) void
+        +calculateTotal() double
+        +getItems() List~MenuItem~
+        +clearCart() void
+    }
 
-class RestaurantManager{
-    <<Singleton>>
-    +searchRestaurant(location)
-    +getRestaurants()
-}
+    class Order {
+        <<interface>>
+        +getUser() User
+        +getRestaurant() Restaurant
+        +getItems() List~MenuItem~
+        +calculateTotal() double
+        +placeOrder() void
+    }
 
-class Order{
-    <<interface>>
-    +placeOrder()
-    +getTotal()
-}
+    class DeliveryOrder {
+        -User user
+        -Restaurant restaurant
+        -List~MenuItem~ items
+        -String deliveryAddress
+        -double deliveryFee
+        +calculateTotal() double
+        +placeOrder() void
+    }
 
-class DeliveryOrder{
-    +deliveryAddress
-}
+    class TakeawayOrder {
+        -User user
+        -Restaurant restaurant
+        -List~MenuItem~ items
+        +calculateTotal() double
+        +placeOrder() void
+    }
 
-class TakeawayOrder{
-    +pickupTime
-}
+    class PaymentStrategy {
+        <<interface>>
+        +pay(double amount) boolean
+    }
 
-class PaymentService{
-    <<interface>>
-    +pay(amount)
-}
+    class CreditCard {
+        -String cardNumber
+        -String cvv
+        +pay(double amount) boolean
+    }
 
-class CreditCard
-class DebitCard
+    class DebitCard {
+        -String cardNumber
+        +pay(double amount) boolean
+    }
 
-class NotificationService{
-    <<interface>>
-    +send(orderId)
-}
+    class PaymentService {
+        +processPayment(PaymentStrategy strategy, double amount) boolean
+    }
 
-class EmailNotification
-class MobileNotification
+    class NotificationObserver {
+        <<interface>>
+        +notify(String userId, String message) void
+    }
 
-User *-- Cart
-Cart --> Menu
+    class EmailNotification {
+        +notify(String userId, String message) void
+    }
 
-Restaurant "1" *-- "1..*" Menu
+    class MobileNotification {
+        +notify(String userId, String message) void
+    }
 
-RestaurantManager --> Restaurant
+    class NotificationService {
+        -List~NotificationObserver~ observers
+        +registerObserver(NotificationObserver observer) void
+        +notifyAll(String userId, String message) void
+    }
 
-CartService --> Cart
+    Restaurant o-- MenuItem : menu items
+    Cart o-- MenuItem : holds
+    CartService *-- Cart : manages
 
-Order <|.. DeliveryOrder
-Order <|.. TakeawayOrder
+    Order <|.. DeliveryOrder : implements
+    Order <|.. TakeawayOrder : implements
+    DeliveryOrder --> User : references
+    DeliveryOrder --> Restaurant : references
+    DeliveryOrder o-- MenuItem : snapshot items
 
-PaymentService <|.. CreditCard
-PaymentService <|.. DebitCard
+    TakeawayOrder --> User : references
+    TakeawayOrder --> Restaurant : references
+    TakeawayOrder o-- MenuItem : snapshot items
 
-NotificationService <|.. EmailNotification
-NotificationService <|.. MobileNotification
+    PaymentStrategy <|.. CreditCard : implements
+    PaymentStrategy <|.. DebitCard : implements
+    PaymentService ..> PaymentStrategy : executes
 
-DeliveryOrder --> PaymentService
-DeliveryOrder --> NotificationService
-DeliveryOrder --> Restaurant
-
-TakeawayOrder --> PaymentService
-TakeawayOrder --> NotificationService
-TakeawayOrder --> Restaurant
-
-User --> Order
+    NotificationObserver <|.. EmailNotification : implements
+    NotificationObserver <|.. MobileNotification : implements
+    NotificationService o-- NotificationObserver : notifies
 ```
 
 ---
 
-# 2. Order Placement Flow
+## 3. Sequence Trace Diagram
 
 ```mermaid
 sequenceDiagram
+    autonumber
+    actor Client as FoodDeliveryApp (Main)
+    participant CS as CartService
+    participant Cart as Cart
+    participant Order as DeliveryOrder
+    participant PS as PaymentService
+    participant Strategy as CreditCard (PaymentStrategy)
+    participant NS as NotificationService
+    participant Obs as Observers (Email/Mobile)
 
-actor User
+    Client->>CS: addItem(kadhaiPaneer)
+    CS->>Cart: addItem(kadhaiPaneer)
+    Client->>CS: addItem(dalMakhani)
+    CS->>Cart: addItem(dalMakhani)
 
-participant RM as RestaurantManager
-participant Cart
-participant Order
-participant Payment
-participant Notify
+    Client->>CS: calculateTotal()
+    CS->>Cart: calculateTotal()
+    Cart-->>CS: return 400.0
+    CS-->>Client: return 400.0
 
-User->>RM: Search Restaurants
+    Client->>Order: new DeliveryOrder(user, restaurant, items, address, 40.0)
+    Client->>Order: calculateTotal()
+    Order-->>Client: return 440.0
 
-RM-->>User: Restaurant List
+    Client->>PS: processPayment(creditCard, 440.0)
+    PS->>Strategy: pay(440.0)
+    Strategy-->>PS: true
+    PS-->>Client: true
 
-User->>Cart: Add Menu Items
+    Client->>Order: placeOrder()
+    Client->>NS: notifyAll("1", "Order placed successfully!")
+    NS->>Obs: notify("1", message)
 
-User->>Order: Place Order
-
-Order->>Payment: pay(total)
-
-Payment-->>Order: Payment Success
-
-Order->>Notify: send(orderId)
-
-Notify-->>User: Order Confirmation
+    Client->>CS: clearCart()
+    CS->>Cart: clear()
 ```
-
----
-
-# 3. Component Flow
-
-```mermaid
-flowchart LR
-
-A[User]
-
-B[RestaurantManager]
-
-C[Restaurant]
-
-D[Cart]
-
-E[Delivery / Takeaway Order]
-
-F[Payment Service]
-
-G[Notification Service]
-
-A --> B
-B --> C
-A --> D
-D --> E
-E --> F
-F --> G
-G --> A
-```
-
----
-
-# 4. Relationships
-
-| Source             | Relation    | Target              |
-|--------------------|-------------|---------------------|
-| User               | Composition | Cart                |
-| Restaurant         | Composition | Menu                |
-| RestaurantManager  | Association | Restaurant          |
-| CartService        | Association | Cart                |
-| DeliveryOrder      | Implements  | Order               |
-| TakeawayOrder      | Implements  | Order               |
-| CreditCard         | Implements  | PaymentService      |
-| DebitCard          | Implements  | PaymentService      |
-| EmailNotification  | Implements  | NotificationService |
-| MobileNotification | Implements  | NotificationService |
-
----
-
-# 5. Design Patterns
-
-| Pattern      | Class               |
-|--------------|---------------------|
-| Singleton    | RestaurantManager   |
-| Strategy     | PaymentService      |
-| Strategy     | NotificationService |
-| Polymorphism | Order Interface     |
-| Composition  | User, Restaurant    |
-
----
-
-# 6. End-to-End Flow
-
-1. User searches nearby restaurants.
-2. RestaurantManager returns restaurants.
-3. User views menuItem.
-4. Items are added into Cart.
-5. User chooses Delivery or Takeaway.
-6. Appropriate PaymentService processes payment.
-7. NotificationService sends confirmation.
-8. Order is completed successfully.
