@@ -70,7 +70,7 @@ public class FoodDeliveryApp {
         amrikSukhdev.addItem(new MenuItem(1, "Kadhai Paneer", 260.0));
         amrikSukhdev.addItem(new MenuItem(2, "Dal Makhani", 180.0));
 
-        RestaurantManager manager = new RestaurantManager();
+        RestaurantManager manager = RestaurantManager.getInstance();
         manager.addRestaurant(apniRasoi);
         manager.addRestaurant(amrikSukhdev);
 

@@ -8,6 +8,16 @@ import java.util.List;
 public class RestaurantManager {
     List<Restaurant> restaurants = new ArrayList<>();
 
+    private RestaurantManager() {
+
+    }
+
+    private static final RestaurantManager INSTANCE = new RestaurantManager();
+
+    public static RestaurantManager getInstance() {
+        return INSTANCE;
+    }
+
     public List<Restaurant> getRestaurants() {
         return restaurants;
     }
