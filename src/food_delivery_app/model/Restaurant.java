@@ -64,4 +64,9 @@ public class Restaurant {
         }
         this.items.add(menuItem);
     }
+
+    @Override
+    public String toString() {
+        return name + " (" + address + ")";
+    }
 }
